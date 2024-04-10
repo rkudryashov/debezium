@@ -21,12 +21,15 @@ import io.debezium.util.Collect;
  */
 public class PostgresCloudEventsMaker extends CloudEventsMaker {
 
-    static final String TXID_KEY = "txId";
-    static final String XMIN_KEY = "xmin";
-    static final String LSN_KEY = "lsn";
-    static final String SEQUENCE_KEY = "sequence";
+    private static final Set<String> POSTGRES_DATA_FIELDS = Collect.unmodifiableSet(
+            Envelope.FieldName.BEFORE, Envelope.FieldName.AFTER);
 
-    static final Set<String> POSTGRES_SOURCE_FIELDS = Collect.unmodifiableSet(
+    private static final String TXID_KEY = "txId";
+    private static final String XMIN_KEY = "xmin";
+    private static final String LSN_KEY = "lsn";
+    private static final String SEQUENCE_KEY = "sequence";
+
+    private static final Set<String> POSTGRES_SOURCE_FIELDS = Collect.unmodifiableSet(
             TXID_KEY,
             XMIN_KEY,
             LSN_KEY,
@@ -34,7 +37,7 @@ public class PostgresCloudEventsMaker extends CloudEventsMaker {
 
     public PostgresCloudEventsMaker(RecordAndMetadata recordAndMetadata, SerializerType dataContentType, String dataSchemaUriBase,
                                     String cloudEventsSchemaName) {
-        super(recordAndMetadata, dataContentType, dataSchemaUriBase, cloudEventsSchemaName, Envelope.FieldName.BEFORE, Envelope.FieldName.AFTER);
+        super(recordAndMetadata, dataContentType, dataSchemaUriBase, cloudEventsSchemaName);
     }
 
     @Override
@@ -43,6 +46,11 @@ public class PostgresCloudEventsMaker extends CloudEventsMaker {
                 + ";lsn:" + sourceField(LSN_KEY).toString()
                 + ";txId:" + sourceField(TXID_KEY).toString()
                 + ";sequence:" + sourceField(SEQUENCE_KEY).toString();
+    }
+
+    @Override
+    protected Set<String> connectorSpecificDataFields() {
+        return POSTGRES_DATA_FIELDS;
     }
 
     @Override

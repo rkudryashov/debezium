@@ -76,17 +76,17 @@ public class RecordAndMetadataBaseImpl implements RecordAndMetadata {
     }
 
     @Override
-    public Schema dataSchema(String... dataFields) {
+    public Schema dataSchema(Set<String> connectorSpecificDataFields) {
         SchemaBuilder builder = SchemaBuilder.struct().name(dataSchemaName());
 
-        if (dataFields.length == 0) {
+        if (connectorSpecificDataFields.isEmpty()) {
             // copy fields from original data schema
             for (Field field : originalDataSchema.fields()) {
                 builder.field(field.name(), field.schema());
             }
         }
         else {
-            for (String field : dataFields) {
+            for (String field : connectorSpecificDataFields) {
                 builder.field(field, originalDataSchema.field(field).schema());
             }
         }
@@ -95,8 +95,8 @@ public class RecordAndMetadataBaseImpl implements RecordAndMetadata {
     }
 
     @Override
-    public Struct data(String... dataFields) {
-        Schema dataSchema = dataSchema(dataFields);
+    public Struct data(Set<String> connectorSpecificDataFields) {
+        Schema dataSchema = dataSchema(connectorSpecificDataFields);
         Struct data = new Struct(dataSchema);
 
         for (Field field : dataSchema.fields()) {

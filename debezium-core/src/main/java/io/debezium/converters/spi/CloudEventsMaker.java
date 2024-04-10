@@ -68,19 +68,17 @@ public abstract class CloudEventsMaker {
     private final SerializerType dataContentType;
     private final String dataSchemaUriBase;
     private final String cloudEventsSchemaName;
-    private final String[] dataFields;
 
     static final Map<SerializerType, String> CONTENT_TYPE_NAME_MAP = Collect.hashMapOf(
             SerializerType.JSON, "application/json",
             SerializerType.AVRO, "application/avro");
 
     protected CloudEventsMaker(RecordAndMetadata recordAndMetadata, SerializerType dataContentType, String dataSchemaUriBase,
-                               String cloudEventsSchemaName, String... dataFields) {
+                               String cloudEventsSchemaName) {
         this.recordAndMetadata = recordAndMetadata;
         this.dataContentType = dataContentType;
         this.dataSchemaUriBase = dataSchemaUriBase;
         this.cloudEventsSchemaName = cloudEventsSchemaName;
-        this.dataFields = dataFields;
     }
 
     /**
@@ -155,7 +153,7 @@ public abstract class CloudEventsMaker {
      * @return the schema of the data attribute of CloudEvents
      */
     public Schema ceDataAttributeSchema() {
-        return recordAndMetadata.dataSchema(dataFields);
+        return recordAndMetadata.dataSchema(connectorSpecificDataFields());
     }
 
     /**
@@ -164,7 +162,7 @@ public abstract class CloudEventsMaker {
      * @return the value of the data attribute of CloudEvents
      */
     public Struct ceDataAttribute() {
-        return recordAndMetadata.data(dataFields);
+        return recordAndMetadata.data(connectorSpecificDataFields());
     }
 
     /**
@@ -178,6 +176,8 @@ public abstract class CloudEventsMaker {
                         + sourceField(AbstractSourceInfo.DATABASE_NAME_KEY) + "."
                         + CLOUDEVENTS_SCHEMA_SUFFIX;
     }
+
+    protected abstract Set<String> connectorSpecificDataFields();
 
     protected abstract Set<String> connectorSpecificSourceFields();
 

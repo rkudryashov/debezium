@@ -6,6 +6,7 @@
 
 package io.debezium.converters.recordandmetadata;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.apache.kafka.common.header.Header;
@@ -19,6 +20,7 @@ import io.debezium.converters.CloudEventsConverterConfig.MetadataSource;
 import io.debezium.converters.CloudEventsConverterConfig.MetadataSourceValue;
 import io.debezium.converters.spi.CloudEventsMaker;
 import io.debezium.data.Envelope;
+import io.debezium.util.Collect;
 
 public class RecordAndMetadataHeaderImpl extends RecordAndMetadataBaseImpl implements RecordAndMetadata {
 
@@ -73,8 +75,9 @@ public class RecordAndMetadataHeaderImpl extends RecordAndMetadataBaseImpl imple
     }
 
     @Override
-    public Schema dataSchema(String... dataFields) {
-        return getValueFromHeaderOrByDefault(metadataSource.global(), null, null, super::dataSchema, () -> super.dataSchema(dataFields));
+    public Schema dataSchema(Set<String> connectorSpecificDataFields) {
+        return getValueFromHeaderOrByDefault(metadataSource.global(), null, null, () -> super.dataSchema(Collect.unmodifiableSet()),
+                () -> super.dataSchema(connectorSpecificDataFields));
     }
 
     private <T> T getValueFromHeaderOrByDefault(MetadataSourceValue metadataSourceValue,

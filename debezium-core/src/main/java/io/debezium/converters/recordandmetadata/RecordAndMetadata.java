@@ -33,9 +33,9 @@ public interface RecordAndMetadata {
 
     String dataSchemaName();
 
-    Schema dataSchema(String... dataFields);
+    Schema dataSchema(Set<String> connectorSpecificDataFields);
 
-    Struct data(String... dataFields);
+    Struct data(Set<String> connectorSpecificDataFields);
 
     String connectorType();
 
